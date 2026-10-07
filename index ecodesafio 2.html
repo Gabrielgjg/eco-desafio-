@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Eco-Desafío: Mi huella en el planeta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --anil:#22307b; --anil-2:#18225c; --papel:#fff8ea; --tinta:#1c1a17;
+  --rosa:#d1006c; --cempa:#f2a900; --verde:#2f8f4e; --naranja:#e4661a; --rojo:#c3241c; --agua:#1f6fb2; --humo:#5b5b66;
+  --yo:#7b3fa0; --casa:#c26a00; --com:#2f8f4e;
+  --display:'Alfa Slab One', Rockwell, Georgia, serif;
+  --texto:'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--anil);color:var(--papel);font-family:var(--texto);font-size:16px;line-height:1.5;min-height:100vh;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.picado{height:28px;background:conic-gradient(from -45deg at 50% 100%, var(--rosa) 90deg, transparent 0) 0 0/34px 100%,
+  linear-gradient(var(--cempa),var(--cempa)) 0 0/100% 6px no-repeat}
+main{max-width:880px;margin:0 auto;padding:14px 14px 48px}
+.pantalla{display:none}.pantalla.activa{display:block}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.12;margin:0 0 .4em}
+h1{font-size:clamp(2.1rem,8vw,3.4rem)} h2{font-size:clamp(1.35rem,5vw,1.9rem)} h3{font-size:1.12rem}
+p{margin:0 0 .75em}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--cempa);outline-offset:3px}
+.btn{font-family:var(--display);font-size:1rem;background:var(--cempa);color:var(--tinta);border:3px solid var(--tinta);border-radius:6px;
+  padding:.6em 1.1em;min-height:48px;box-shadow:4px 4px 0 var(--tinta);cursor:pointer;touch-action:manipulation}
+.btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--tinta)}
+.btn.sec{background:var(--papel)} .btn.ancho{width:100%}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.hoja{background:var(--papel);color:var(--tinta);border:3px solid var(--tinta);border-radius:8px;padding:16px}
+.hoja+.hoja{margin-top:14px}
+.muted{opacity:.75;font-size:.92rem}
+.fila{display:flex;gap:10px;flex-wrap:wrap}.fila>*{flex:1 1 130px}
+.campo{display:flex;flex-direction:column;gap:4px;font-weight:700;margin-bottom:10px}
+.campo input,.campo select{padding:11px 12px;border:2px solid var(--tinta);border-radius:6px;background:#fff;color:var(--tinta);min-height:48px;width:100%}
+.msg{min-height:1.3em;font-weight:700;margin:6px 0 0}
+.msg.mal{color:var(--rojo)} .msg.bien{color:var(--verde)}
+/* Inicio */
+.portada{display:grid;gap:16px}
+@media(min-width:820px){.portada{grid-template-columns:1fr 1fr;align-items:start}}
+.lema{font-size:1.12rem}
+.como li{margin-bottom:6px}
+.tipo{display:inline-block;color:#fff;font-weight:700;font-size:.78rem;border-radius:999px;padding:2px 10px;white-space:nowrap}
+.tipo.yo{background:var(--yo)} .tipo.casa{background:var(--casa)} .tipo.comunidad{background:var(--com)}
+/* Tablero fijo */
+.tablero{position:sticky;top:0;z-index:20;background:var(--anil-2);border-bottom:3px solid var(--cempa);margin:0 -14px 14px;padding:8px 12px 10px}
+.medidores{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:880px;margin:0 auto}
+.med{background:var(--papel);color:var(--tinta);border-radius:6px;padding:5px 6px;text-align:center;border:2px solid var(--tinta)}
+.med .v{font-family:var(--display);font-size:1.25rem;line-height:1.1;display:block}
+.med .u{font-size:.72rem;font-weight:700;opacity:.8}
+.med.co2 .v{color:var(--humo)} .med.agua .v{color:var(--agua)} .med.com .v{color:var(--verde)}
+.med.pulso{animation:pulso .6s ease}
+@keyframes pulso{30%{transform:scale(1.06);background:#fff1c7}}
+.dias{display:flex;justify-content:center;gap:6px;margin-top:6px}
+.dias span{width:30px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;border:2px solid var(--papel);opacity:.55}
+.dias span.hoy{background:var(--cempa);color:var(--tinta);border-color:var(--cempa);opacity:1}
+.dias span.hecho{background:var(--papel);color:var(--tinta);opacity:.9}
+/* Día */
+.evento{display:flex;gap:12px;align-items:flex-start;background:#fff3d1;border:2px dashed var(--tinta);border-radius:8px;padding:10px 12px;color:var(--tinta);margin-bottom:12px}
+.evento .e{font-size:1.8rem;line-height:1}
+.decision .preg{font-size:1.12rem;font-weight:700;margin:8px 0 10px}
+.op{display:block;width:100%;text-align:left;border:2px solid var(--tinta);background:#fff;border-radius:8px;padding:12px 14px;margin-bottom:8px;cursor:pointer;min-height:52px;color:var(--tinta);touch-action:manipulation;font-size:1rem}
+.op:hover{background:#fffaf0}
+.op[disabled]{cursor:default}
+.op.elegida{background:#fff1c7;border-width:3px}
+.op .imp{display:block;font-size:.82rem;font-weight:700;margin-top:4px;opacity:.85}
+.retro{background:#fff;border:2px solid var(--tinta);border-left:8px solid var(--cempa);border-radius:6px;padding:10px 12px;margin:6px 0 12px}
+.retro .deltas{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.deltas b{font-size:.9rem;border-radius:999px;padding:2px 10px;background:#eef2f7}
+.progreso{font-weight:700;font-size:.9rem;margin-bottom:6px}
+/* Ficha */
+.ficha-cab{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.grafica{background:#fff;border:2px solid var(--tinta);border-radius:6px;padding:10px;margin:8px 0}
+.grafica svg{width:100%;height:auto;display:block}
+.tabs{display:flex;gap:6px;margin-bottom:8px}
+.tabs button{flex:1;border:2px solid var(--tinta);background:#fff;border-radius:6px;padding:8px;font-weight:700;cursor:pointer;min-height:44px;color:var(--tinta)}
+.tabs button[aria-selected=true]{background:var(--tinta);color:var(--papel)}
+.mito{border-radius:6px;padding:10px 12px;margin:8px 0}
+.mito.m{background:#fbe3e0;border:2px solid var(--rojo)} .mito.r{background:#e2f4e8;border:2px solid var(--verde)}
+.fuente{font-size:.78rem;opacity:.7;margin:4px 2px 8px}
+.leyenda{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.88rem;margin-top:6px}
+.leyenda i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px;border:1px solid rgba(0,0,0,.3)}
+/* Final */
+.leccion{background:#e2f4e8;border:2px solid var(--verde);border-radius:8px;padding:12px;margin:10px 0;color:var(--tinta)}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:8px 0}
+@media(min-width:620px){.kpis{grid-template-columns:repeat(4,1fr)}}
+.kpi{background:#fff;border:2px solid var(--tinta);border-radius:6px;padding:8px;text-align:center}
+.kpi b{font-family:var(--display);font-weight:400;font-size:1.35rem;display:block;line-height:1.15}
+.kpi span{font-size:.78rem}
+.comp{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;border:2px solid var(--tinta);background:#fff;border-radius:6px;padding:10px;margin-bottom:6px;cursor:pointer;min-height:48px;color:var(--tinta)}
+.comp .caja{flex:0 0 24px;height:24px;border:2px solid var(--tinta);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700}
+.comp[aria-pressed=true]{background:#fff1c7}
+.comp[aria-pressed=true] .caja{background:var(--tinta);color:var(--papel)}
+.carnet{max-width:440px;margin:10px auto;border:3px solid var(--tinta);border-radius:14px;overflow:hidden;background:#fff;color:var(--tinta);box-shadow:5px 5px 0 var(--tinta)}
+.carnet .cab{background:var(--verde);color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.carnet .cab b{font-family:var(--display);font-weight:400;font-size:1.1rem}
+.carnet .cuerpo{padding:12px 14px}
+.carnet ol{padding-left:20px;margin:6px 0}
+.carnet li{margin-bottom:6px}
+.carnet .pie{font-size:.78rem;background:#f4efe3;padding:8px 14px;border-top:2px dashed var(--tinta)}
+.colectivo{background:#fff;border:2px solid var(--tinta);border-radius:6px;padding:10px;margin-top:8px}
+.oculto{display:none!important}
+/* Modal universal */
+.modal{position:fixed;inset:0;background:rgba(10,14,40,.8);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
+.modal.abierto{display:flex}
+.modal .hoja{max-width:520px;width:100%;max-height:88vh;overflow:auto}
+@media print{
+  @page{margin:12mm}
+  body{background:#fff!important;color:#000}
+  body>*:not(main){display:none!important}
+  main>*:not(#p-final){display:none!important}
+  #p-final .no-imprimir{display:none!important}
+  .hoja{border:1px solid #888;box-shadow:none}
+  main{max-width:none;padding:0}
+  .kpis{grid-template-columns:repeat(4,1fr)}
+  .carnet{box-shadow:none;break-inside:avoid}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="picado" aria-hidden="true"></div>
+<main>
+
+<!-- INICIO -->
+<section id="p-inicio" class="pantalla activa">
+  <div class="portada">
+    <div>
+      <h1>Eco-Desafío</h1>
+      <p class="lema">Vive una semana en la colonia El Mezquite, en la zona metropolitana de Guadalajara. Cada día tomarás decisiones y verás cuánta agua y cuánto CO₂ hay detrás de ellas.</p>
+      <ul class="como">
+        <li><span class="tipo yo">Yo decido</span> Cosas que dependen de ti.</li>
+        <li><span class="tipo casa">Propongo en casa</span> Ideas que puedes proponer a tu familia.</li>
+        <li><span class="tipo comunidad">Con mi comunidad</span> Acciones con tu escuela o tu colonia.</li>
+      </ul>
+      <p class="muted">No hay respuestas «malas»: la idea es descubrir qué pesa más y dónde vale la pena poner el esfuerzo.</p>
+    </div>
+    <div class="hoja">
+      <h3>¿Quién vive esta semana?</h3>
+      <div class="campo"><label for="i-nombre">Nombre y apellido</label><input id="i-nombre" maxlength="40" autocomplete="off"></div>
+      <div class="campo"><label for="i-sec">Secundaria</label><input id="i-sec" maxlength="60" autocomplete="off" placeholder="Ej. Secundaria Técnica 45"></div>
+      <div class="fila">
+        <div class="campo"><label for="i-grado">Grado</label><select id="i-grado"><option>1°</option><option>2°</option><option>3°</option></select></div>
+        <div class="campo"><label for="i-letra">Grupo</label><select id="i-letra"><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option><option>I</option><option>J</option></select></div>
+      </div>
+      <p class="msg mal" id="msg-ini" role="status"></p>
+      <button class="btn ancho" id="b-empezar">Empezar la semana</button>
+      <button class="btn sec ancho oculto" id="b-continuar" style="margin-top:10px">Continuar mi semana</button>
+    </div>
+  </div>
+</section>
+
+<!-- JUEGO -->
+<section id="p-juego" class="pantalla">
+  <div class="tablero" aria-label="Tablero de mi semana">
+    <div class="medidores">
+      <div class="med co2" id="m-co2"><span class="v" id="v-co2">0</span><span class="u">💨 kg de CO₂</span></div>
+      <div class="med agua" id="m-agua"><span class="v" id="v-agua">0</span><span class="u">💧 litros de agua</span></div>
+      <div class="med com" id="m-com"><span class="v" id="v-com">0</span><span class="u">🌿 acciones en comunidad</span></div>
+    </div>
+    <div class="dias" id="dias"></div>
+  </div>
+  <div id="escena"></div>
+</section>
+
+<!-- FINAL -->
+<section id="p-final" class="pantalla">
+  <div class="hoja">
+    <h2>Tu semana en datos</h2>
+    <p id="f-intro"></p>
+    <div class="kpis" id="kpis"></div>
+    <div class="tabs no-imprimir" role="tablist" id="tabs-final"><button data-s="agua" aria-selected="true">💧 Agua</button><button data-s="co2" aria-selected="false">💨 CO₂</button></div>
+    <div class="grafica" id="g-final"></div>
+    <div class="leyenda"><span><i style="background:#c9c3b6"></i>Semana de costumbre</span><span><i style="background:var(--agua)" id="ley-tu"></i>Tu semana</span></div>
+    <div class="leccion" id="leccion"></div>
+  </div>
+  <div class="hoja">
+    <h3>Lo que lograste con tu comunidad</h3>
+    <div id="f-com"></div>
+    <div class="colectivo" id="colectivo"></div>
+  </div>
+  <div class="hoja no-imprimir" id="caja-comp">
+    <h3>Elige tus compromisos</h3>
+    <p class="muted">Uno de cada tipo. Elige cosas que de verdad puedas cumplir.</p>
+    <div id="compromisos"></div>
+    <button class="btn ancho" id="b-carnet" disabled>Crear mi carnet</button>
+  </div>
+  <div id="carnet-caja"></div>
+  <div class="hoja no-imprimir oculto" id="caja-enviar">
+    <div class="fila"><button class="btn" id="b-imprimir">Imprimir o guardar PDF</button><button class="btn sec" id="b-enviar">Enviar a mi profesor</button></div>
+    <p class="msg" id="msg-env" role="status"></p>
+    <button class="btn sec ancho" id="b-nueva" style="margin-top:10px">Vivir otra semana</button>
+  </div>
+  <p class="muted no-imprimir" style="margin-top:14px;font-size:.8rem">Valores aproximados y redondeados. Huella hídrica: Water Footprint Network (Mekonnen y Hoekstra). Emisiones de alimentos: Poore y Nemecek (2018). Usos del agua: CONAGUA, Estadísticas del Agua en México. Las cifras de la escuela y la colonia son estimaciones para el juego.</p>
+</section>
+</main>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true"><div class="hoja" id="modal-doc"></div></div>
+
+<script>
+(function(){
+'use strict';
+/* ====== CONFIGURACIÓN DEL DOCENTE ======
+   URL /exec del registro único de los juegos (misma hoja para todos; este juego usa la pestaña «EcoDesafio»).
+   Panel oculto: agrega ?docente al final de la dirección.             */
+const CONFIG={urlAppsScript:'https://script.google.com/macros/s/AKfycbygRk9A6WzIUDJGxFjJY659rdNhNQchklDIGif_iAygyiV6eDChynsv8Lxs-2tE_TMahg/exec'};
+
+const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const nf=(n,d=0)=>Number(n).toLocaleString('es-MX',{maximumFractionDigits:d,minimumFractionDigits:0});
+const TIPO={yo:'Yo decido',casa:'Propongo en casa',comunidad:'Con mi comunidad'};
+const EJES={agua:'Agua en casa',comida:'Alimentación',transporte:'Transporte y energía',residuos:'Residuos'};
+
+/* ---------- La semana ---------- */
+// op: [texto, litros, kg CO2, acción comunitaria (1/0), retroalimentación, extras {colonia, botellas}]
+const DIAS=[
+{d:'Lunes',titulo:'El agua en casa',
+ evento:['📢','Aviso en el grupo de vecinos','«El miércoles habrá tandeo en la colonia: no llegará agua por la red. Llenen sus tinacos.»'],
+ dec:[
+  {tipo:'yo',eje:'agua',p:'Hora de bañarte antes de la escuela.',ops:[
+   ['Me baño como siempre, unos 15 minutos',150,.75,0,'Una regadera común tira unos 10 litros por minuto. Además, calentar esa agua con gas genera CO₂.'],
+   ['Me baño en 8 minutos',80,.4,0,'Casi la mitad del agua y del gas.'],
+   ['Me baño en 5 minutos y junto en una cubeta el agua fría del principio',40,.25,0,'El agua fría del inicio sirve después para el excusado o para trapear.']]},
+  {tipo:'yo',eje:'agua',p:'Te lavas los dientes.',ops:[
+   ['Con la llave abierta todo el tiempo',12,0,0,'Unos 2 minutos con la llave abierta son alrededor de 12 litros.'],
+   ['Con un vaso de agua',.5,0,0,'Ahorras unos 11 litros. Bien hecho, aunque es poco comparado con otras cosas: lo verás en la ficha del día.']]},
+  {tipo:'casa',eje:'agua',p:'El excusado hace un ruidito: el agua corre todo el tiempo.',ops:[
+   ['No es asunto mío',1000,0,0,'Una fuga así puede tirar unos 200 litros al día. En toda la semana, ¡unos 1,000 litros!'],
+   ['Le aviso a mi familia y revisamos juntos el flotador del tanque',50,0,0,'Muchas fugas del excusado se arreglan ajustando o cambiando una pieza barata. Solo se perdió agua mientras se reparaba.']]}],
+ ficha:{titulo:'¿Qué gasta más agua?',series:[{n:'Litros',u:'L',c:'#1f6fb2',datos:[['Lavarte los dientes con la llave abierta',12],['Bañarte 15 minutos',150],['Excusado con fuga (un solo día)',200]]}],
+  fuente:'Valores aproximados: regadera común ~10 L/min; llave abierta ~6 L/min; una fuga en el excusado puede tirar cientos de litros al día.',
+  mito:'Cerrar la llave al lavarte los dientes es lo más importante para cuidar el agua.',
+  realidad:'Ayuda, pero un baño largo gasta más de 10 veces eso, y una fuga sin reparar todavía más. Para cuidar el agua conviene empezar por lo que más gasta.'}},
+{d:'Martes',titulo:'La comida',
+ evento:['🍽️','Recreo','Hoy toca comprar el lunch en la cooperativa de la escuela.'],
+ dec:[
+  {tipo:'yo',eje:'comida',p:'¿Qué comes en el recreo?',ops:[
+   ['Una hamburguesa de res',2300,9,0,'Producir carne de res requiere muchísima agua, sobre todo para cultivar el alimento del ganado, y las vacas emiten metano.'],
+   ['Una torta de pollo',650,1.5,0,'El pollo necesita bastante menos agua y emite mucho menos que la res.'],
+   ['Tacos de frijoles con nopales',300,.2,0,'Frijol y nopal están entre lo más bajo en agua y emisiones. Y son muy mexicanos.']]},
+  {tipo:'yo',eje:'residuos',p:'¿Qué tomas?',ops:[
+   ['Un refresco en botella de plástico',200,.2,0,'El azúcar del refresco necesita mucha agua para cultivarse, y la botella se vuelve basura.'],
+   ['Agua embotellada',3,.1,0,'Necesita poca agua para producirse, pero la botella de plástico se vuelve basura.'],
+   ['Agua de mi termo',1,0,0,'Un termo que se reutiliza evita cientos de botellas al año.']]},
+  {tipo:'comunidad',eje:'residuos',p:'En la escuela casi no hay dónde rellenar agua: casi todos compran botellas.',ops:[
+   ['Así son las cosas',0,0,0,'Nada cambia: cada día se juntan cientos de botellas en la escuela.'],
+   ['Con mi grupo, proponemos a la dirección un garrafón o bebedero para rellenar termos',0,0,1,'Si la propuesta funciona, la escuela podría evitar alrededor de mil botellas a la semana.',{botellas:1000}]]}],
+ ficha:{titulo:'¿Cuánto cuesta una porción?',series:[
+   {n:'💧 Agua',u:'L',c:'#1f6fb2',datos:[['Hamburguesa de res',2300],['Torta de pollo',650],['Tacos de frijol',300]]},
+   {n:'💨 CO₂',u:'kg',c:'#5b5b66',datos:[['Hamburguesa de res',9],['Torta de pollo',1.5],['Tacos de frijol',.2]]}],
+  fuente:'Porción de unos 150 g. Agua: Water Footprint Network. CO₂: Poore y Nemecek (2018). Valores aproximados: cambian según cómo se produce cada alimento.',
+  mito:'Para cuidar el planeta, todos tendrían que dejar de comer carne.',
+  realidad:'No se trata de prohibir. Cambiar algunas comidas de res por frijol, huevo o pollo reduce mucho la huella. El frijol y el maíz son la base de la comida mexicana desde hace miles de años.'}},
+{d:'Miércoles',titulo:'Sin agua',
+ evento:['🚱','Tandeo','Hoy no llegó agua por la red. Solo queda la del tinaco, y hay que hacerla rendir.'],
+ dec:[
+  {tipo:'casa',eje:'agua',p:'Hay que lavar los trastes de la comida con el agua del tinaco.',ops:[
+   ['Con el chorro abierto, como siempre',60,0,0,'Con la llave abierta se van unos 60 litros. Hoy, con el tinaco a la mitad, se nota.'],
+   ['Propongo enjabonar todo con la llave cerrada y enjuagar al final',20,0,0,'El mismo resultado con un tercio del agua.']]},
+  {tipo:'comunidad',eje:'agua',p:'En la esquina hay una fuga que lleva días tirando agua limpia a la calle.',ops:[
+   ['Seguro alguien ya la reportó',0,0,0,'Cuando todos piensan eso, nadie la reporta. Una fuga así puede tirar miles de litros al día.'],
+   ['Con mi familia, la reportamos al SIAPA',0,0,1,'La repararon al día siguiente. Se salvaron miles de litros para toda la colonia.',{colonia:6000}]]},
+  {tipo:'casa',eje:'agua',p:'La lavadora va a tirar el agua del último enjuague.',ops:[
+   ['Que se vaya al drenaje',40,0,0,'Esa agua todavía servía, y para el excusado habrá que usar agua limpia del tinaco.'],
+   ['Propongo juntarla en cubetas para el excusado y para trapear',0,0,0,'Así el agua sirve dos veces. Se le llama reutilizar «agua gris».']]}],
+ ficha:{titulo:'¿Quién usa el agua en México?',pastel:[['Agricultura',76,'#2f8f4e'],['Ciudades y casas',15,'#1f6fb2'],['Industria',5,'#c26a00'],['Electricidad',4,'#7b3fa0']],
+  fuente:'Usos del agua concesionada en México (porcentajes redondeados). Fuente: CONAGUA, Estadísticas del Agua en México.',
+  mito:'Si falta agua en la ciudad, es porque la gente la desperdicia en su casa.',
+  realidad:'Lo que hacemos en casa importa, pero las ciudades usan solo una parte del agua del país. Además, se estima que en muchas ciudades de México se pierde entre 30% y 40% del agua en fugas de la red. Reportar fugas y exigir mantenimiento también es cuidar el agua.'}},
+{d:'Jueves',titulo:'Ir y venir',
+ evento:['🌫️','Aire sucio','En las noticias dicen que hoy la calidad del aire en la ciudad es mala.'],
+ dec:[
+  {tipo:'casa',eje:'transporte',p:'¿Cómo te vas a la escuela? Vives a 3 km.',ops:[
+   ['Me llevan en auto',0,1,0,'Un auto de gasolina emite unos 170 gramos de CO₂ por kilómetro, además de gases que ensucian el aire.'],
+   ['Propongo irnos en camión',0,.5,0,'El camión lleva a muchas personas: a cada una le toca una parte más pequeña de la emisión.'],
+   ['Propongo caminar o ir en bici con un compañero, si la calle es segura',0,0,0,'Cero emisiones, y además haces ejercicio.']]},
+  {tipo:'yo',eje:'transporte',p:'Tarde libre.',ops:[
+   ['3 horas de videojuegos en la consola',0,.2,0,'La consola gasta electricidad, y en México gran parte de la electricidad se produce quemando gas y petróleo.'],
+   ['3 horas viendo videos en el celular',0,.1,0,'Menos que la consola, pero también usa energía: la del celular y la de los servidores de internet.'],
+   ['Futbol en el parque con mis amigos',0,0,0,'Cero emisiones, y un buen rato con tus amigos.']]},
+  {tipo:'comunidad',eje:'transporte',p:'En el recreo, las luces y los ventiladores del salón se quedan prendidos.',ops:[
+   ['No es mi responsabilidad',0,0,0,'Así se queda, todos los días, en todos los salones.'],
+   ['Propongo que cada semana alguien del grupo sea «guardián de la energía»',0,0,1,'Un cambio pequeño, repetido en todos los salones, ahorra mucha energía.']]}],
+ ficha:{titulo:'¿Qué emite más CO₂?',series:[{n:'kg de CO₂',u:'kg',c:'#5b5b66',datos:[['Ida y vuelta en auto (6 km)',1],['Ida y vuelta en camión (6 km)',.5],['3 horas de videojuegos',.2],['Cargador conectado sin celular (un día)',.002]]}],
+  fuente:'Valores aproximados. Auto de gasolina con una persona; electricidad con el factor de emisión de la red mexicana.',
+  mito:'Desconectar el cargador es de lo más importante para ahorrar energía.',
+  realidad:'Un cargador sin celular gasta muy poco. El transporte y calentar agua pesan muchísimo más. Saber qué pesa más ayuda a decidir dónde poner el esfuerzo.'}},
+{d:'Viernes',titulo:'Lo que tiramos',
+ evento:['🗑️','La esquina','El camión de la basura no pasó ayer y hay bolsas acumuladas en la esquina.'],
+ dec:[
+  {tipo:'yo',eje:'residuos',p:'Te sobró media torta del lunch.',ops:[
+   ['A la basura',150,.3,0,'Tirar comida también tira el agua y la energía que costó producirla. En el basurero, además, genera metano.'],
+   ['La guardo para más tarde o la comparto',0,0,0,'La comida que se aprovecha no se vuelve basura.']]},
+  {tipo:'casa',eje:'residuos',p:'En tu casa, toda la basura va en una sola bolsa.',ops:[
+   ['Todo junto, como siempre',0,.5,0,'Mezclada, casi nada se puede aprovechar y todo termina en el relleno sanitario.'],
+   ['Propongo separar orgánicos, reciclables y el resto',0,.2,0,'Separada, los reciclables se pueden recuperar y los orgánicos pueden volverse composta.']]},
+  {tipo:'comunidad',eje:'residuos',p:'En la escuela, la basura del recreo va toda al mismo contenedor.',ops:[
+   ['Así se ha hecho siempre',0,0,0,'Todo termina en el relleno sanitario.'],
+   ['Proponemos una composta escolar con las cáscaras y restos del recreo',0,0,1,'Los restos de comida se vuelven abono para las plantas de la escuela en lugar de basura.']]}],
+ ficha:{titulo:'¿Cuántas botellas son?',series:[{n:'Botellas',u:'botellas',c:'#c26a00',datos:[['1 alumno en una semana',5],['Un grupo de 40 en una semana',200],['Una escuela de 600 en una semana',3000]]}],
+  extra:'Y en todo el ciclo escolar (40 semanas): <b>unas 120,000 botellas</b> en una sola escuela.',
+  fuente:'Cálculo con 1 botella por alumno por día de clases.',
+  mito:'Si tiro la botella en el contenedor de reciclables, el problema está resuelto.',
+  realidad:'Reciclar ayuda, pero no todo lo que se tira se recicla, y reciclar también usa energía y agua. Lo que más reduce la basura es no generarla: reutilizar un termo es mejor que reciclar cien botellas.'}}
+];
+const COMPROMISOS={
+ yo:['Bañarme en 5 minutos o menos','Llevar mi termo todos los días','Llevar un lunch que no genere basura','Cerrar la llave mientras me enjabono'],
+ casa:['Revisar con mi familia si hay fugas, una vez al mes','Proponer cambiar algunas comidas de res por frijol, huevo o pollo','Separar la basura en casa','Reusar el agua fría de la regadera'],
+ comunidad:['Reportar al SIAPA las fugas que vea en la calle','Proponer un garrafón o bebedero en mi salón','Participar en la composta o la separación de la escuela','Ser guardián de la energía en mi salón']};
+const MEDIDA={'Bañarme en 5 minutos o menos':'Usaré un temporizador una semana.','Llevar mi termo todos los días':'Contaré cuántas botellas dejé de comprar.',
+ 'Llevar un lunch que no genere basura':'Revisaré si mi lunch deja envolturas.','Cerrar la llave mientras me enjabono':'Lo haré cada vez durante un mes.',
+ 'Revisar con mi familia si hay fugas, una vez al mes':'Anotaré la fecha de cada revisión.','Proponer cambiar algunas comidas de res por frijol, huevo o pollo':'Contaremos cuántas veces a la semana lo logramos.',
+ 'Separar la basura en casa':'Tendremos tres botes o bolsas distintas.','Reusar el agua fría de la regadera':'Tendremos una cubeta junto a la regadera.',
+ 'Reportar al SIAPA las fugas que vea en la calle':'Guardaré el número de reporte.','Proponer un garrafón o bebedero en mi salón':'Lo propondremos por escrito a la dirección.',
+ 'Participar en la composta o la separación de la escuela':'Llevaré mis cáscaras al lugar acordado.','Ser guardián de la energía en mi salón':'Revisaré luces y ventiladores en cada recreo.'};
+
+/* ---------- Estado ---------- */
+const NUEVO=()=>({j:null,dia:0,paso:0,ver:'dec',sel:{},comp:{},folio:'',enviado:false});
+let E=ls.get('eco-estado',null)||NUEVO();
+const guardar=()=>ls.set('eco-estado',E);
+const clave=(d,i)=>d+'-'+i;
+function totales(costumbre){
+  const t={agua:0,co2:0,acc:0,colonia:0,botellas:0,ejes:{}};Object.keys(EJES).forEach(k=>t.ejes[k]={agua:0,co2:0});
+  DIAS.forEach((D,d)=>D.dec.forEach((dec,i)=>{const k=clave(d,i);const oi=costumbre?0:E.sel[k];if(oi===undefined)return;const o=dec.ops[oi];
+    t.agua+=o[1];t.co2+=o[2];t.acc+=o[3];t.ejes[dec.eje].agua+=o[1];t.ejes[dec.eje].co2+=o[2];
+    if(o[5]){t.colonia+=o[5].colonia||0;t.botellas+=o[5].botellas||0}}));
+  return t;
+}
+function mostrar(id){$$('.pantalla').forEach(p=>p.classList.toggle('activa',p.id===id));window.scrollTo(0,0)}
+function modal(h){$('#modal-doc').innerHTML=h+'<div style="margin-top:12px"><button class="btn sec" data-cerrar>Cerrar</button></div>';$('#modal').classList.add('abierto')}
+document.addEventListener('click',e=>{if(e.target.closest('[data-cerrar]')||e.target.id==='modal')$('#modal').classList.remove('abierto')});
+
+/* ---------- Tablero ---------- */
+let mostrado={agua:0,co2:0,acc:0};
+function animar(el,de,a,dec){if(reduce||de===a){el.textContent=nf(a,dec);return}const t0=performance.now(),dur=600;
+  const f=t=>{const k=Math.min(1,(t-t0)/dur);el.textContent=nf(de+(a-de)*(1-Math.pow(1-k,3)),dec);if(k<1)requestAnimationFrame(f)};requestAnimationFrame(f)}
+function pintarTablero(){
+  const t=totales(false);
+  [['agua','#v-agua','#m-agua',0],['co2','#v-co2','#m-co2',1],['acc','#v-com','#m-com',0]].forEach(([k,v,m,dec])=>{
+    if(mostrado[k]!==t[k]){animar($(v),mostrado[k],t[k],dec);const mm=$(m);mm.classList.remove('pulso');void mm.offsetWidth;mm.classList.add('pulso');mostrado[k]=t[k]}
+    else $(v).textContent=nf(t[k],dec)});
+  $('#v-com').textContent=nf(t.acc)+' de 4';
+  $('#dias').innerHTML=DIAS.map((D,i)=>`<span class="${i===E.dia?'hoy':i<E.dia?'hecho':''}" title="${D.d}">${D.d.slice(0,2)}</span>`).join('');
+}
+
+/* ---------- Inicio ---------- */
+(function(){const j=ls.get('eco-jugador',null);if(j){$('#i-nombre').value=j.nombre||'';$('#i-sec').value=j.secundaria||'';if(j.grado)$('#i-grado').value=j.grado;if(j.letra)$('#i-letra').value=j.letra}
+  if(E.j)$('#b-continuar').classList.remove('oculto')})();
+$('#b-empezar').addEventListener('click',()=>{
+  const nombre=$('#i-nombre').value.trim(),sec=$('#i-sec').value.trim();
+  if(nombre.length<2){$('#msg-ini').textContent='Escribe tu nombre.';return}
+  if(sec.length<3){$('#msg-ini').textContent='Escribe el nombre de tu secundaria.';return}
+  const j={nombre,secundaria:sec,grado:$('#i-grado').value,letra:$('#i-letra').value};ls.set('eco-jugador',j);
+  E=NUEVO();E.j=j;E.folio='ECO-'+Math.random().toString(36).slice(2,6).toUpperCase();guardar();mostrado={agua:0,co2:0,acc:0};jugar();
+});
+$('#b-continuar').addEventListener('click',()=>{mostrado=(()=>{const t=totales(false);return {agua:t.agua,co2:t.co2,acc:t.acc}})();E.dia>=DIAS.length?final():jugar()});
+
+/* ---------- Jornada ---------- */
+function jugar(){mostrar('p-juego');pintarTablero();pintarEscena()}
+function pintarEscena(){
+  const D=DIAS[E.dia];
+  if(E.ver==='ficha'){pintarFicha(D);return}
+  const ev=D.evento;
+  let h=`<h2>${D.d}: ${esc(D.titulo)}</h2>
+   <div class="evento"><span class="e">${ev[0]}</span><div><b>${esc(ev[1])}</b><br>${esc(ev[2])}</div></div>`;
+  D.dec.forEach((dec,i)=>{if(i>E.paso)return;const k=clave(E.dia,i),sel=E.sel[k];
+    h+=`<div class="hoja decision" id="dec-${i}"><div class="progreso">Decisión ${i+1} de ${D.dec.length} <span class="tipo ${dec.tipo}">${TIPO[dec.tipo]}</span></div>
+     <p class="preg">${esc(dec.p)}</p>`;
+    h+=dec.ops.map((o,oi)=>{const el=sel===oi;if(sel!==undefined&&!el)return '';
+      return `<button class="op${el?' elegida':''}" data-i="${i}" data-o="${oi}" ${sel!==undefined?'disabled':''}>${esc(o[0])}</button>`}).join('');
+    if(sel!==undefined){const o=dec.ops[sel];
+      const del=[];if(o[1])del.push(`💧 +${nf(o[1],1)} L`);if(o[2])del.push(`💨 +${nf(o[2],2)} kg CO₂`);if(o[3])del.push('🌿 +1 acción en comunidad');if(!del.length)del.push('Sin litros ni CO₂ extra');
+      h+=`<div class="retro"><div class="deltas">${del.map(x=>`<b>${x}</b>`).join('')}</div>${esc(o[4])}</div>`;
+      if(i===E.paso&&i<D.dec.length-1)h+=`<button class="btn ancho" data-sig="1">Siguiente decisión</button>`;
+      if(i===D.dec.length-1)h+=`<button class="btn ancho" data-ficha="1">Ver la ficha de evidencia del día</button>`}
+    h+=`</div>`});
+  $('#escena').innerHTML=h;
+}
+$('#escena').addEventListener('click',e=>{
+  const b=e.target.closest('.op');
+  if(b&&!b.disabled){const i=+b.dataset.i;E.sel[clave(E.dia,i)]=+b.dataset.o;guardar();pintarTablero();pintarEscena();
+    const r=document.querySelector(`#dec-${i} .retro`);if(r)r.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});return}
+  if(e.target.closest('[data-sig]')){E.paso++;guardar();pintarEscena();const n=$(`#dec-${E.paso}`);if(n)n.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});return}
+  if(e.target.closest('[data-ficha]')){E.ver='ficha';guardar();pintarEscena();window.scrollTo(0,0);return}
+  const tb=e.target.closest('[data-serie]');if(tb){serieFicha=+tb.dataset.serie;pintarFicha(DIAS[E.dia]);return}
+  if(e.target.closest('[data-dia-sig]')){E.dia++;E.paso=0;E.ver='dec';serieFicha=0;guardar();if(E.dia>=DIAS.length){final();return}pintarTablero();pintarEscena();window.scrollTo(0,0)}
+});
+
+/* ---------- Gráficas SVG ---------- */
+function barrasH(datos,u,color,resaltar){
+  const W=360,fila=46,H=datos.length*fila+6,max=Math.max(...datos.map(d=>d[1]));
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Gráfica de barras">`;
+  datos.forEach(([et,v],i)=>{const y=i*fila+4,w=Math.max(3,(W-80)*v/max);const destacar=resaltar&&resaltar(et);
+    s+=`<text x="0" y="${y+12}" font-size="12.5" fill="#1c1a17" ${destacar?'font-weight="700"':''}>${esc(et)}</text>
+      <rect x="0" y="${y+18}" width="${w}" height="18" rx="3" fill="${color}" ${destacar?'stroke="#1c1a17" stroke-width="2"':''}/>
+      <text x="${w+6}" y="${y+32}" font-size="12.5" font-weight="700" fill="#1c1a17">${nf(v,v<1?3:1)} ${u}</text>`});
+  return s+'</svg>';
+}
+function pastel(datos){
+  const R=70,cx=90,cy=90;let a0=-Math.PI/2,s=`<svg viewBox="0 0 360 180" role="img" aria-label="Gráfica de pastel">`;
+  const tot=datos.reduce((a,d)=>a+d[1],0);
+  datos.forEach(([et,v,c],i)=>{const a1=a0+2*Math.PI*v/tot,g=a1-a0>Math.PI?1:0;
+    s+=`<path d="M${cx} ${cy} L${cx+R*Math.cos(a0)} ${cy+R*Math.sin(a0)} A${R} ${R} 0 ${g} 1 ${cx+R*Math.cos(a1)} ${cy+R*Math.sin(a1)}Z" fill="${c}" stroke="#fff" stroke-width="2"/>`;
+    s+=`<rect x="190" y="${28+i*34}" width="16" height="16" rx="3" fill="${c}"/><text x="212" y="${41+i*34}" font-size="13" fill="#1c1a17"><tspan font-weight="700">${v}%</tspan> ${esc(et)}</text>`;a0=a1});
+  return s+`<circle cx="${cx}" cy="${cy}" r="30" fill="#fff"/><text x="${cx}" y="${cy+5}" text-anchor="middle" font-size="12" font-weight="700" fill="#1c1a17">México</text></svg>`;
+}
+let serieFicha=0;
+function pintarFicha(D){
+  const F=D.ficha;
+  let g='';
+  if(F.pastel)g=pastel(F.pastel);
+  else{const S=F.series[serieFicha]||F.series[0];
+    if(F.series.length>1)g=`<div class="tabs" role="tablist">${F.series.map((x,i)=>`<button data-serie="${i}" aria-selected="${i===serieFicha}">${x.n}</button>`).join('')}</div>`;
+    const elegidas=D.dec.map((dec,i)=>{const o=dec.ops[E.sel[clave(E.dia,i)]];return o?o[0].toLowerCase():''});
+    g+=barrasH(S.datos,S.u,S.c)}
+  $('#escena').innerHTML=`<div class="hoja">
+    <div class="ficha-cab"><span style="font-size:1.6rem">📊</span><div><span class="muted">Ficha de evidencia: ${D.d}</span><h2 style="margin:0">${esc(F.titulo)}</h2></div></div>
+    <div class="grafica">${g}</div><p class="fuente">${esc(F.fuente)}</p>
+    ${F.extra?`<p>${F.extra}</p>`:''}
+    <div class="mito m"><b>❌ Mito:</b> ${esc(F.mito)}</div>
+    <div class="mito r"><b>✅ Lo que dicen los datos:</b> ${esc(F.realidad)}</div>
+    <button class="btn ancho" data-dia-sig="1" style="margin-top:8px">${E.dia<DIAS.length-1?'Ir al '+DIAS[E.dia+1].d.toLowerCase():'Ver el resumen de mi semana'}</button></div>`;
+}
+
+/* ---------- Final ---------- */
+let serieFinal='agua';
+function final(){
+  mostrar('p-final');const t=totales(false),c=totales(true);
+  const ahA=Math.max(0,c.agua-t.agua),ahC=Math.max(0,c.co2-t.co2);
+  const pA=c.agua?Math.round(100*ahA/c.agua):0,pC=c.co2?Math.round(100*ahC/c.co2):0;
+  $('#f-intro').innerHTML=`${esc(E.j.nombre.split(' ')[0])}, comparamos tu semana con una «semana de costumbre», en la que todo se hace como siempre. Usaste <b>${pA}% menos agua</b> y generaste <b>${pC}% menos CO₂</b>.`;
+  $('#kpis').innerHTML=`<div class="kpi"><b>${nf(t.agua)}</b><span>litros en tu semana</span></div><div class="kpi"><b>${nf(ahA)}</b><span>litros ahorrados</span></div>
+    <div class="kpi"><b>${nf(t.co2,1)}</b><span>kg de CO₂ en tu semana</span></div><div class="kpi"><b>${nf(ahC,1)}</b><span>kg de CO₂ evitados</span></div>`;
+  pintarFinal();
+  // La lección: lo personal y lo colectivo
+  const comida=c.ejes.comida.agua-t.ejes.comida.agua;
+  let lec=`<b>¿Qué pesó más?</b> `;
+  const ejeMax=Object.keys(EJES).sort((a,b)=>c.ejes[b].agua-c.ejes[a].agua)[0];
+  lec+=`En la semana de costumbre, lo que más agua usó fue <b>${EJES[ejeMax].toLowerCase()}</b>. `;
+  if(comida>0)lec+=`Solo con tu decisión de la comida ahorraste ${nf(comida)} litros: más de lo que se ahorra en meses cerrando la llave al lavarte los dientes. `;
+  if(t.colonia)lec+=`Y al reportar la fuga de la esquina se salvaron unos <b>${nf(t.colonia)} litros</b> para la colonia: ${ahA?`unas ${nf(Math.max(1,Math.round(t.colonia/ahA)))} veces lo que ahorraste tú en toda la semana`:'más que todo lo que usa una familia en varios días'}. Lo personal y lo colectivo se necesitan.`;
+  else lec+=`Una fuga en la calle puede tirar en un día más agua que la que usa tu familia en una semana. Reportarla es una de las acciones con más impacto que hay.`;
+  $('#leccion').innerHTML=lec;
+  $('#f-com').innerHTML=`<div class="kpis"><div class="kpi"><b>${t.acc} de 4</b><span>acciones en comunidad</span></div>
+    <div class="kpi"><b>${nf(t.colonia)}</b><span>litros salvados en la colonia</span></div>
+    <div class="kpi"><b>${nf(t.botellas)}</b><span>botellas que se podrían evitar</span></div>
+    <div class="kpi"><b>${t.acc>=3?'🌿🌿🌿':t.acc>=1?'🌿':'—'}</b><span>${t.acc>=3?'Gran equipo':t.acc>=1?'Buen comienzo':'Todavía no'}</span></div></div>
+    <p class="muted">${t.acc<4?'Las acciones en comunidad no siempre se notan en tu huella personal, pero multiplican el impacto: involucran a muchas personas a la vez.':'Propusiste todas las acciones en comunidad. Así es como un cambio deja de ser de una persona y se vuelve de todos.'}</p>`;
+  cargarColectivo();
+  pintarCompromisos();
+  if(E.comp.yo&&E.comp.casa&&E.comp.comunidad&&E.carnet)crearCarnet();
+}
+function pintarFinal(){
+  const t=totales(false),c=totales(true),k=serieFinal;
+  const datos=[];Object.keys(EJES).forEach(e=>{datos.push([EJES[e]+' (costumbre)',c.ejes[e][k],'#c9c3b6']);datos.push([EJES[e]+' (tu semana)',t.ejes[e][k],k==='agua'?'#1f6fb2':'#5b5b66'])});
+  const W=360,fila=40,H=datos.length*fila+6,max=Math.max(1,...datos.map(d=>d[1]));
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Comparación por tema">`;
+  datos.forEach(([et,v,col],i)=>{const y=i*fila+(i%2?0:6),w=Math.max(2,(W-90)*v/max);
+    s+=`<text x="0" y="${y+11}" font-size="11.5" fill="#1c1a17" ${i%2?'font-weight="700"':''}>${esc(et)}</text><rect x="0" y="${y+15}" width="${w}" height="15" rx="3" fill="${col}"/><text x="${w+5}" y="${y+27}" font-size="11.5" font-weight="700">${nf(v,k==='co2'?1:0)} ${k==='agua'?'L':'kg'}</text>`});
+  $('#g-final').innerHTML=s+'</svg>';$('#ley-tu').style.background=k==='agua'?'#1f6fb2':'#5b5b66';
+}
+$('#tabs-final').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b)return;serieFinal=b.dataset.s;$$('#tabs-final button').forEach(x=>x.setAttribute('aria-selected',x===b));pintarFinal()});
+
+function urlRegistro(){return ls.get('eco-url','')||CONFIG.urlAppsScript||''}
+async function cargarColectivo(){
+  const d=$('#colectivo'),url=urlRegistro();const g=E.j.grado+' '+E.j.letra;
+  if(!url){d.innerHTML='<p class="muted" style="margin:0">Cuando tu profesor active el registro, aquí verás lo que lograron juntos tu grupo y tu secundaria.</p>';return}
+  d.innerHTML='<p class="muted" style="margin:0">Consultando lo que lograron juntos…</p>';
+  try{const r=await fetch(url+(url.includes('?')?'&':'?')+'accion=resumen&juego=eco&secundaria='+encodeURIComponent(E.j.secundaria)+'&grupo='+encodeURIComponent(g));const j=await r.json();if(!j.ok)throw 0;
+    const f=(x,n)=>x.jugadores?`<p style="margin:0 0 6px"><b>${n}</b> (${x.jugadores} ${x.jugadores===1?'persona':'personas'}): ${nf(x.aguaAhorrada)} litros y ${nf(x.co2Ahorrado,1)} kg de CO₂ ahorrados, ${x.acciones} acciones en comunidad.</p>`:'';
+    const h=f(j.grupo,'Tu grupo '+g)+f(j.secundaria,'Tu secundaria');
+    d.innerHTML='<b>Juntos suman más</b><br>'+(h||'<p class="muted" style="margin:0">Todavía nadie de tu grupo ha enviado su semana. ¡Sé el primero!</p>');
+  }catch(e){d.innerHTML='<p class="muted" style="margin:0">No se pudo consultar lo que lograron juntos. Revisa tu conexión.</p>'}
+}
+function pintarCompromisos(){
+  $('#compromisos').innerHTML=Object.keys(COMPROMISOS).map(tp=>`<p style="margin:10px 0 6px"><span class="tipo ${tp}">${TIPO[tp]}</span></p>`+
+    COMPROMISOS[tp].map(c=>`<button class="comp" data-tp="${tp}" data-c="${esc(c)}" aria-pressed="${E.comp[tp]===c}"><span class="caja">${E.comp[tp]===c?'✓':''}</span><span>${esc(c)}</span></button>`).join('')).join('');
+  $('#b-carnet').disabled=!(E.comp.yo&&E.comp.casa&&E.comp.comunidad);
+}
+$('#compromisos').addEventListener('click',e=>{const b=e.target.closest('.comp');if(!b)return;E.comp[b.dataset.tp]=b.dataset.c;guardar();pintarCompromisos()});
+$('#b-carnet').addEventListener('click',()=>{E.carnet=true;guardar();crearCarnet();$('#carnet-caja').scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'})});
+function crearCarnet(){
+  const t=totales(false),c=totales(true),fecha=new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
+  $('#carnet-caja').innerHTML=`<div class="carnet"><div class="cab"><b>Carnet de Ciudadano Global</b><span>🌎</span></div>
+    <div class="cuerpo"><p style="margin:0"><b>${esc(E.j.nombre)}</b><br>${esc(E.j.secundaria)} · ${esc(E.j.grado)} ${esc(E.j.letra)}</p>
+    <p class="muted" style="margin:4px 0 8px">Folio ${esc(E.folio)} · ${fecha}</p>
+    <p style="margin:0 0 4px"><b>Mi semana:</b> ${nf(Math.max(0,c.agua-t.agua))} litros y ${nf(Math.max(0,c.co2-t.co2),1)} kg de CO₂ menos que la costumbre; ${t.acc} acciones en comunidad.</p>
+    <b>Me comprometo a:</b><ol>${['yo','casa','comunidad'].map(tp=>`<li>${esc(E.comp[tp])}<br><span class="muted">${esc(MEDIDA[E.comp[tp]]||'')}</span></li>`).join('')}</ol></div>
+    <div class="pie">Muestra este carnet en el stand de la feria «De los datos a la acción» para obtener tu sello.</div></div>`;
+  $('#caja-enviar').classList.remove('oculto');
+  const url=urlRegistro();$('#b-enviar').disabled=!url||E.enviado;
+  $('#msg-env').className='msg';$('#msg-env').textContent=!url?'El envío al profesor no está activado.':E.enviado?'Tu semana ya fue enviada.':'';
+}
+$('#b-imprimir').addEventListener('click',()=>window.print());
+$('#b-enviar').addEventListener('click',async()=>{
+  const url=urlRegistro();if(!url||E.enviado)return;const b=$('#b-enviar');b.disabled=true;$('#msg-env').textContent='Enviando…';
+  const t=totales(false),c=totales(true);
+  const body=JSON.stringify({juego:'eco',nombre:E.j.nombre,secundaria:E.j.secundaria,grupo:E.j.grado+' '+E.j.letra,co2:t.co2,agua:t.agua,co2Costumbre:c.co2,aguaCostumbre:c.agua,
+    acciones:t.acc,colonia:t.colonia,botellas:t.botellas,compromisos:[E.comp.yo,E.comp.casa,E.comp.comunidad].join(' | ')});
+  try{const r=await fetch(url,{method:'POST',body});const j=await r.json();if(!j.ok)throw 0;E.enviado=true;guardar();$('#msg-env').className='msg bien';$('#msg-env').textContent='Enviado a tu profesor.'}
+  catch(e){try{await fetch(url,{method:'POST',body,mode:'no-cors'});E.enviado=true;guardar();$('#msg-env').className='msg';$('#msg-env').textContent='Enviado. Si tu profesor no lo ve, avísale.'}
+    catch(e2){b.disabled=false;$('#msg-env').className='msg mal';$('#msg-env').textContent='No se pudo enviar. Revisa tu conexión.'}}
+  cargarColectivo();
+});
+let nuevaArm=0;
+$('#b-nueva').addEventListener('click',()=>{if(Date.now()-nuevaArm>3000){nuevaArm=Date.now();$('#msg-env').className='msg';$('#msg-env').textContent='Toca otra vez para empezar una semana nueva (tu carnet actual se borrará de este equipo).';return}
+  const j=E.j;E=NUEVO();E.j=j;E.folio='ECO-'+Math.random().toString(36).slice(2,6).toUpperCase();guardar();mostrado={agua:0,co2:0,acc:0};$('#carnet-caja').innerHTML='';$('#caja-enviar').classList.add('oculto');jugar()});
+
+/* ---------- Panel docente oculto ---------- */
+if(new URLSearchParams(location.search).has('docente')){
+  modal(`<h3>Configuración del docente</h3><label class="campo">URL /exec de Apps Script (solo este navegador)<input id="cfg-url" value="${esc(urlRegistro())}"></label>
+   <div class="fila"><button class="btn" id="cfg-guardar">Guardar</button><button class="btn sec" id="cfg-borrar">Borrar progreso de este equipo</button></div><p class="msg" id="cfg-msg"></p>`);
+  document.addEventListener('click',e=>{
+    if(e.target.id==='cfg-guardar'){const u=$('#cfg-url').value.trim();u?ls.set('eco-url',u):ls.del('eco-url');$('#cfg-msg').textContent='Guardado.'}
+    if(e.target.id==='cfg-borrar'){ls.del('eco-estado');E=NUEVO();$('#b-continuar').classList.add('oculto');$('#cfg-msg').textContent='Progreso borrado.'}});
+}
+})();
+</script>
+</body>
+</html>
